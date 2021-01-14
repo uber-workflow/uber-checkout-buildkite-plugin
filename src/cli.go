@@ -45,7 +45,7 @@ func logAndExit(err error, code int) {
 }
 
 func bkLogGroup(str string) {
-	fmt.Printf("~~~ %s ~~~\n", str)
+	fmt.Printf("~~~ %s\n", str)
 }
 
 func run(name string, args ...string) (string, error) {

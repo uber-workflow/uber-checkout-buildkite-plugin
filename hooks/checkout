@@ -4,8 +4,8 @@ set -euo pipefail
 
 readonly dir="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
-echo "~~~ building binary ~~~"
+echo "~~~ building binary"
 "$dir"/../build.sh
 
-echo "~~~ running cli ~~~"
+echo "~~~ running cli"
 ./cli

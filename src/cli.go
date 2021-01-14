@@ -19,7 +19,7 @@ func main() {
 		logAndExit(err1, 1)
 	}
 
-	// test: call git
+	// test: call aws
 	bkLogGroup("testing aws")
 	_, err2 := run("aws", "--version")
 	if err2 != nil {

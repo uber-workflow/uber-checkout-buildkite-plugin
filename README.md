@@ -4,3 +4,6 @@ see [ERD](https://docs.google.com/document/d/1iZRX1ZaRG05gA-aZ-uj2LWHmHuP3cXys15
 
 # build
 ./build.sh
+
+# run
+./cli

@@ -1,0 +1,8 @@
+#!/bin/bash
+BIN=$(dirname "$0")
+echo $BIN
+case $OSTYPE in
+  darwin*) "$BIN/uber-checkout-darwin-amd64" "$@" ;;
+  linux*) "$BIN/uber-checkout-linux-amd64" "$@" ;;
+  *) "$BIN/uber-checkout-linux-amd64" "$@" ;;
+esac

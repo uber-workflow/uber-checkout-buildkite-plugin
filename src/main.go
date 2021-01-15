@@ -5,6 +5,8 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/uber-workflow/checkout/utils"
 )
 
 func main() {
@@ -33,9 +35,13 @@ func main() {
 		fmt.Println(pair[0])
 	}
 
-	// test: call function from another file
+	// test: call function from another package in module
 	bkLogGroup("testing function call Foo() from utils.go")
-	fmt.Println(Foo())
+	fmt.Println(utils.Foo())
+
+	// test: call function from remote package
+	bkLogGroup("testing function call Hello() from utils.go")
+	fmt.Println(utils.Hello())
 
 }
 

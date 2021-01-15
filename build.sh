@@ -13,11 +13,11 @@ fi
 
 # build in docker image
 docker run --rm \
-  -v "$dir/src":/usr/src/_cli \
-  -w /usr/src/_cli \
+  -v "$dir/src":/usr/src \
+  -w /usr/src \
   -e GOOS="$GOOS" \
   -e GOARCH="$GOARCH" \
   golang:1.15-alpine \
-  go build ./...
+  go build ./main.go
 
-mv "${dir}/src/_cli" ./cli
+mv "${dir}/src/main" ./cli

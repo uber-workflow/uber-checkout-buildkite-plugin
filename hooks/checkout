@@ -1,8 +1,16 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 set -euo pipefail
 
+callsign="$BUILDKITE_PLUGIN_UBER_CHECKOUT_CALLSIGN"
+
 readonly dir="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
+. "${dir}/lib/utils.sh"
+
+staging_uri=$(get_staging_uri "$callsign")
+
+echo "staging uri: ${staging_uri}"
+
 echo "~~~ running cli"
-"$dir"/../bin/uber-checkout
+"$dir"/../bin/uber-checkout --stagingRepo "$staging_uri"

@@ -4,45 +4,28 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 
-	"github.com/uber-workflow/checkout/utils"
+	"gopkg.in/alecthomas/kingpin.v2"
+)
+
+type Repo struct {
+	base string // ex: gitolite@code.uberinternal.com
+	name string // ex: infra/buildkite-webhook-proxy
+}
+
+var (
+	branch         = kingpin.Flag("branch", "Buildkite branch").Envar("BUILDKITE_BRANCH").Required().String()
+	commit         = kingpin.Flag("commit", "Buildkite Commit").Envar("BUILDKITE_COMMIT").Required().String()
+	buildInitiator = kingpin.Flag("buildInitiator", "DIFF, MAIN, SUBMIT_QUEUE").Envar("BUILD_INITIATOR").Default("MAIN").String()
+	diffIds        = kingpin.Flag("diffIds", "Diff Ids").Envar("DIFF_IDS").String()
+	repo           = kingpin.Flag("repo", "Main Gitolite Repo").Envar("BUILDKITE_REPO").Required().String()
+	stagingRepo    = kingpin.Flag("stagingRepo", "Staging Gitolite Repo").Required().String()
+	pipeline       = kingpin.Flag("pipeline", "Buildkite pipeline").Envar("BUILDKITE_PIPELINE").Required().String()
 )
 
 func main() {
-	// test: execute a shell binary
-	bkLogGroup("running ls -al")
-	run("ls", "-al")
-
-	// test: call git
-	bkLogGroup("testing git commands")
-	_, err1 := run("git", "--version")
-	if err1 != nil {
-		logAndExit(err1, 1)
-	}
-
-	// test: call aws
-	bkLogGroup("testing aws")
-	_, err2 := run("aws", "--version")
-	if err2 != nil {
-		logAndExit(err2, 1)
-	}
-
-	// test: log out all env variables
-	bkLogGroup("testing env variables")
-	for _, e := range os.Environ() {
-		pair := strings.SplitN(e, "=", 2)
-		fmt.Println(pair[0])
-	}
-
-	// test: call function from another package in module
-	bkLogGroup("testing function call Foo() from utils.go")
-	fmt.Println(utils.Foo())
-
-	// test: call function from remote package
-	bkLogGroup("testing function call Hello() from utils.go")
-	fmt.Println(utils.Hello())
-
+	kingpin.Parse()
+	fmt.Printf("%s, %s, %s, %s, %s, %s, %s", *branch, *commit, *buildInitiator, *diffIds, *repo, *stagingRepo, *pipeline)
 }
 
 func logAndExit(err error, code int) {

@@ -1,0 +1,9 @@
+name: Uber Checkout
+description: performant checkout of a phabricator repository
+author: Albert Wu (wua@uber.com)
+requirements: []
+configuration:
+  properties:
+    - callsign:
+        type: string
+  required: [callsign]

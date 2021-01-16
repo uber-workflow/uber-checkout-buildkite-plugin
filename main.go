@@ -20,7 +20,7 @@ var (
 	diffIds        = kingpin.Flag("diffIds", "Diff Ids").Envar("DIFF_IDS").String()
 	repo           = kingpin.Flag("repo", "Main Gitolite Repo").Envar("BUILDKITE_REPO").Required().String()
 	stagingRepo    = kingpin.Flag("stagingRepo", "Staging Gitolite Repo").Required().String()
-	pipeline       = kingpin.Flag("pipeline", "Buildkite pipeline").Envar("BUILDKITE_PIPELINE").Required().String()
+	pipeline       = kingpin.Flag("pipeline", "Buildkite pipeline").Envar("BUILDKITE_PIPELINE_SLUG").Required().String()
 )
 
 func main() {

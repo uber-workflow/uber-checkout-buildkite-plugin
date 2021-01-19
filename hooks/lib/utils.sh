@@ -27,13 +27,13 @@ function ensure_var() {
   fi
 }
 
-####################
+# ------------------------------------------------------------
 # Returns repo metadata for the given phab URI.
 # Arguments:
 #   A phab uri | ex: 'gitolite@code.uber.internal:web-code'
 # Returns:
 #   Phab repo metadata, which includes primary and staging uri's
-####################
+# ------------------------------------------------------------
 get_repo_info() {
   local uri=$1 # example: 'gitolite@code.uber.internal:web-code'
   curl -s -X POST \

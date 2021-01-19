@@ -38,7 +38,7 @@ function fetch_refs() {
 
   # set staging remote
   git remote | grep -w "staging" && git remote rm staging
-  git remote add staging "$remote_uri"
+  git remote add staging "$staging_remote_uri"
 
   # If $git_ref starts with phabricator/, fetch from staging. Else fetch from primary.
   if [[ $git_ref == phabricator/* ]]; then

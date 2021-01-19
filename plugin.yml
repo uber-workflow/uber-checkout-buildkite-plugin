@@ -1,0 +1,8 @@
+name: uber checkout buildkite plugin
+description: overrides default buildkite checkout with logic for Uber's workflow
+author: Albert Wu (wua@uber.com)
+configuration:
+  properties:
+    - callsign:
+        type: string
+  required: [callsign]

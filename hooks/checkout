@@ -4,6 +4,54 @@ set -euo pipefail
 
 readonly dir="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
-"$dir"/../build.sh
+. "$dir"/lib/utils.sh
 
-./cli
+# takes space-separated list of diff ids, ex: "16928591 16929049 16931817"
+# gets diffs from staging refs, ex: "phabricator/diff/16956521"
+function apply_diffs() {
+  local diff_ids_arr=("$1")
+  echo "TODO: applying diff ids ${diff_ids_arr[*]}"
+}
+
+# fetch_refs <remote_uri> <ref>
+# gets git repo and checks out the specified ref
+# ex1: checkout gitolite@code.uber.internal:web-code main
+# ex2: checkout gitolite@code.uber.internal:web-code 69efbc0d245c185b4c964f3e9fd88c9c94a425d9
+# ex3: checkout gitolite@code.uber.internal:web-code phabricator/diff/16956521
+function fetch_refs() {
+  local remote_uri="$1"
+  local git_ref="$2"
+  local staging_remote_uri
+  staging_remote_uri=$(get_repo_info "$remote_uri" | jq -r '.result[0].staging.uri')
+  ensure_var "remote_uri"
+  ensure_var "staging_remote_uri"
+
+  # clean workspace
+  find . -maxdepth 1 -mindepth 1 -print0 | xargs -0 rm -rf
+  
+  # TODO: install cache here (initialize primary and staging repo from cached .git folder)
+  git init
+
+  # set primary remote
+  git remote | grep -w "origin" && git remote rm origin
+  git remote add origin "$remote_uri"
+
+  # set staging remote
+  git remote | grep -w "staging" && git remote rm staging
+  git remote add staging "$remote_uri"
+
+  # If $git_ref starts with phabricator/, fetch from staging. Else fetch from primary.
+  if [[ $git_ref == phabricator/* ]]; then
+    git fetch --shallow-since=1.month.ago staging "$git_ref"
+  else
+    git fetch --shallow-since=1.month.ago origin "$git_ref"
+  fi
+
+  git checkout FETCH_HEAD
+}
+
+fetch_refs "$BUILDKITE_REPO" "$BUILDKITE_BRANCH"
+git checkout "$BUILDKITE_COMMIT"
+if [ -n "${DIFF_IDS:-}" ]; then
+  apply_diffs "$DIFF_IDS"
+fi

@@ -15,6 +15,7 @@ function exit_with_error() {
 
 # ------------------------------------------------------------
 # Function that checks for the existence of an variable
+# Exits with error if variable is not set
 #   Args:
 #     1: <string> Variable name
 # ------------------------------------------------------------
@@ -28,14 +29,14 @@ function ensure_var() {
 }
 
 # ------------------------------------------------------------
-# Returns repo metadata for the given phab URI.
-# Arguments:
-#   A phab uri | ex: 'gitolite@code.uber.internal:web-code'
-# Returns:
-#   Phab repo metadata, which includes primary and staging uri's
+# Returns repo metadata for the given gitolite repository URI.
+#   Args:
+#     1: <string> A gitolite repository URI, ex: 'gitolite@code.uber.internal:web-code'
+#   Returns:
+#     Phab repo metadata, which includes primary and staging uri's
 # ------------------------------------------------------------
 function get_repo_info() {
-  local uri=$1 # example: 'gitolite@code.uber.internal:web-code'
+  local uri=$1
   curl -s -X POST \
   --data-urlencode "params={\"remoteURIs\":[\"${uri}\"],\"__conduit__\":{\"token\":\"${CONDUIT_TOKEN}\"}}" \
   'https://code.uberinternal.com/api/repository.query'

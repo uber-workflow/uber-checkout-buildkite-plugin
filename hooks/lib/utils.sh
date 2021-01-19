@@ -28,20 +28,15 @@ function ensure_var() {
 }
 
 ####################
-# Returns the staging uri for a given phab callsign.
+# Returns repo metadata for the given phab URI.
 # Arguments:
-#   A phab callsign | ex: 'WEBCODR'
+#   A phab uri | ex: 'gitolite@code.uber.internal:web-code'
 # Returns:
 #   Phab repo metadata, which includes primary and staging uri's
 ####################
 get_repo_info() {
-  local callsign=$1
+  local uri=$1 # example: 'gitolite@code.uber.internal:web-code'
   curl -s -X POST \
-  --data-urlencode "params={\"callsigns\":[\"${callsign}\"],\"__conduit__\":{\"token\":\"${CONDUIT_TOKEN}\"}}" \
+  --data-urlencode "params={\"remoteURIs\":[\"${uri}\"],\"__conduit__\":{\"token\":\"${CONDUIT_TOKEN}\"}}" \
   'https://code.uberinternal.com/api/repository.query'
-}
-
-# removes everything in the current working directory
-clean_workspace() {
-  find . -maxdepth 1 -mindepth 1 -print0 | xargs -0 -I {} rm -rf {}
 }

@@ -13,34 +13,32 @@ function apply_diffs() {
   echo "TODO: applying diff ids ${diff_ids_arr[*]}"
 }
 
-# get_git_repo <phab callsign> <ref>
+# fetch_refs <remote_uri> <ref>
 # gets git repo and checks out the specified ref
-# ex1: checkout WEBCODR main
-# ex2: checkout WEBCODR 69efbc0d245c185b4c964f3e9fd88c9c94a425d9
-# ex2: checkout WEBCODR phabricator/diff/16956521
-function get_git_repo() {
-  local callsign="$1"
+# ex1: checkout gitolite@code.uber.internal:web-code main
+# ex2: checkout gitolite@code.uber.internal:web-code 69efbc0d245c185b4c964f3e9fd88c9c94a425d9
+# ex3: checkout gitolite@code.uber.internal:web-code phabricator/diff/16956521
+function fetch_refs() {
+  local remote_uri="$1"
   local git_ref="$2"
-  local primary_remote_uri
   local staging_remote_uri
-  primary_remote_uri=$(get_repo_info "$callsign" | jq -r '.result[0].remoteURI')
-  staging_remote_uri=$(get_repo_info "$callsign" | jq -r '.result[0].staging.uri')
-  ensure_var "primary_remote_uri"
+  staging_remote_uri=$(get_repo_info "$remote_uri" | jq -r '.result[0].staging.uri')
+  ensure_var "remote_uri"
   ensure_var "staging_remote_uri"
 
   # clean workspace
   find . -maxdepth 1 -mindepth 1 -print0 | xargs -0 rm -rf
   
-  # TODO: install cache here (initialize a cache of the primary repo's .git folder from cache)
+  # TODO: install cache here (initialize primary and staging repo from cached .git folder)
   git init
 
   # set primary remote
-  git remote rm origin || true
-  git remote add origin "$primary_remote_uri"
+  git remote | grep -w "origin" && git remote rm origin
+  git remote add origin "$remote_uri"
 
   # set staging remote
-  git remote rm staging || true
-  git remote add staging "$staging_remote_uri"
+  git remote | grep -w "staging" && git remote rm staging
+  git remote add staging "$remote_uri"
 
   # If $git_ref starts with phabricator/, fetch from staging. Else fetch from primary.
   if [[ $git_ref == phabricator/* ]]; then
@@ -49,12 +47,11 @@ function get_git_repo() {
     git fetch --shallow-since=1.month.ago origin "$git_ref"
   fi
 
-  # check out what we just fetched
-  git checkout -f FETCH_HEAD
+  git checkout FETCH_HEAD
 }
 
-get_git_repo "$BUILDKITE_PLUGIN_UBER_CHECKOUT_CALLSIGN" "$BUILDKITE_BRANCH"
+fetch_refs "$BUILDKITE_REPO" "$BUILDKITE_BRANCH"
 git checkout "$BUILDKITE_COMMIT"
-if [ -n "$DIFF_IDS" ]; then
+if [ -n "${DIFF_IDS:-}" ]; then
   apply_diffs "$DIFF_IDS"
 fi

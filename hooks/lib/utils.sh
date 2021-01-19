@@ -34,7 +34,7 @@ function ensure_var() {
 # Returns:
 #   Phab repo metadata, which includes primary and staging uri's
 # ------------------------------------------------------------
-get_repo_info() {
+function get_repo_info() {
   local uri=$1 # example: 'gitolite@code.uber.internal:web-code'
   curl -s -X POST \
   --data-urlencode "params={\"remoteURIs\":[\"${uri}\"],\"__conduit__\":{\"token\":\"${CONDUIT_TOKEN}\"}}" \

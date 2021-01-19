@@ -7,7 +7,7 @@ readonly dir="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 . "$dir"/lib/utils.sh
 
 # takes space-separated list of diff ids, ex: "16928591 16929049 16931817"
-# gets diffs from staging refs
+# gets diffs from staging refs, ex: "phabricator/diff/16956521"
 function apply_diffs() {
   local diff_ids_arr=("$1")
   echo "TODO: applying diff ids ${diff_ids_arr[*]}"

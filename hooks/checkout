@@ -7,16 +7,18 @@ readonly dir="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 . "$dir"/lib/utils.sh
 
 # takes space-separated list of diff ids, ex: "16928591 16929049 16931817"
+# gets diffs from staging refs
 function apply_diffs() {
   local diff_ids_arr=("$1")
   echo "TODO: applying diff ids ${diff_ids_arr[*]}"
 }
 
-# checkout <phab callsign> <ref>
+# get_git_repo <phab callsign> <ref>
+# gets git repo and checks out the specified ref
 # ex1: checkout WEBCODR main
 # ex2: checkout WEBCODR 69efbc0d245c185b4c964f3e9fd88c9c94a425d9
 # ex2: checkout WEBCODR phabricator/diff/16956521
-function checkout() {
+function get_git_repo() {
   local callsign="$1"
   local git_ref="$2"
   local primary_remote_uri
@@ -30,6 +32,7 @@ function checkout() {
   find . -maxdepth 1 -mindepth 1 -print0 | xargs -0 rm -rf
   
   # TODO: install cache here (initialize a cache of the primary repo's .git folder from cache)
+  git init
 
   # set primary remote
   git remote rm origin || true
@@ -45,6 +48,13 @@ function checkout() {
   else
     git fetch --shallow-since=1.month.ago origin "$git_ref"
   fi
+
+  # check out what we just fetched
+  git checkout -f FETCH_HEAD
 }
 
-checkout "$BUILDKITE_PLUGIN_UBER_CHECKOUT_CALLSIGN" "$BUILDKITE_BRANCH"
+get_git_repo "$BUILDKITE_PLUGIN_UBER_CHECKOUT_CALLSIGN" "$BUILDKITE_BRANCH"
+git checkout "$BUILDKITE_COMMIT"
+if [ -n "$DIFF_IDS" ]; then
+  apply_diffs "$DIFF_IDS"
+fi

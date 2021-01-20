@@ -6,13 +6,6 @@ readonly dir="$(cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd)"
 
 . "$dir"/lib/utils.sh
 
-# takes space-separated list of diff ids, ex: "16928591 16929049 16931817"
-# gets diffs from staging refs, ex: "phabricator/diff/16956521"
-function apply_diffs() {
-  local diff_ids_arr=("$1")
-  echo "TODO: applying diff ids ${diff_ids_arr[*]}"
-}
-
 # fetch_refs <remote_uri> <ref>
 # gets git repo and checks out the specified ref
 # ex1: checkout gitolite@code.uber.internal:web-code main
@@ -47,11 +40,12 @@ function fetch_refs() {
     git fetch --shallow-since=1.month.ago origin "$git_ref"
   fi
 
+  git config advice.detachedHead false
   git checkout FETCH_HEAD
 }
 
 fetch_refs "$BUILDKITE_REPO" "$BUILDKITE_BRANCH"
 git checkout "$BUILDKITE_COMMIT"
 if [ -n "${DIFF_IDS:-}" ]; then
-  apply_diffs "$DIFF_IDS"
+  "$dir"/lib/apply_diffs.sh "$DIFF_IDS"
 fi

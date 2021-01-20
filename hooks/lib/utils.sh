@@ -41,3 +41,34 @@ function get_repo_info() {
   --data-urlencode "params={\"remoteURIs\":[\"${uri}\"],\"__conduit__\":{\"token\":\"${CONDUIT_TOKEN}\"}}" \
   'https://code.uberinternal.com/api/repository.query'
 }
+
+# ------------------------------------------------------------
+# Quiet git; commands are silent unless they fail
+#   Args:
+#     ...: git command arguments
+# ------------------------------------------------------------
+function gitq() {
+  if [ "${VERBOSE:-}" = "true" ]; then
+    git "$@"
+  else
+    local set_flags=$-
+    local stdout
+    stdout=$(mktemp)
+    local stderr
+    stderr=$(mktemp)
+    local exit_code
+
+    if [[ $set_flags =~ e ]]; then set +e; fi
+    git "$@" </dev/null >"$stdout" 2>"$stderr"
+    exit_code=$?
+    if [[ $set_flags =~ e ]]; then set -e; fi
+
+    if [ $exit_code -ne 0 ]; then
+      cat "$stderr" >&2
+      rm -f "$stdout" "$stderr"
+      exit $exit_code
+    fi
+
+    rm -f "$stdout" "$stderr"
+  fi
+}
